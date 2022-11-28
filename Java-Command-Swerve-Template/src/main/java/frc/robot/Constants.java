@@ -59,7 +59,17 @@ public final class Constants {
         public static final double kWheelDiameterMeters = 0.0; // wheel diameter
         public static final double kRotorGearRatio = 0.0; // number of turns it takes the motor to rotate the rotor 1 revolution
 
-        // rotor + throttle current limiting
+        public static final double kPathingX_kP = 0.1;
+        public static final double kPathingX_kI = 0.0;
+        public static final double kPathingX_kD = 0.0;
+
+        public static final double kPathingY_kP = 0.1;
+        public static final double kPathingY_kI = 0.0;
+        public static final double kPathingY_kD = 0.0;
+
+        public static final double kPathingTheta_kP = 0.1;
+        public static final double kPathingTheta_kI = 0.0;
+        public static final double kPathingTheta_kD = 0.0;
     }
 
     public static final double kVoltageCompensation = 12.0;
