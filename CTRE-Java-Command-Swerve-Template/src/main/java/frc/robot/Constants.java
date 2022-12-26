@@ -75,12 +75,12 @@ public final class Constants {
         // (number of turns it takes the motor to rotate the rotor one revolution)
         public static final double kThrottleGearRatio = 0.0; 
 
-        // This value will be multiplied to the raw RPM of the throttle motor
+        // This value will be multiplied to the raw encoder velocity of the throttle motor
         // and should convert it to meters per second
         // This is the general formula: 
-        //     (1.0 / GEAR RATIO / 60.0_seconds) * WHEEL DIAMETER * Math.PI;
+        //     (1.0 / GEAR RATIO / 2048) * WHEEL DIAMETER * Math.PI * 10;
         public static final double kThrottleVelocityConversionFactor = 
-            (1/kThrottleGearRatio/60)*kWheelDiameterMeters*Math.PI;
+            (1/kThrottleGearRatio/2048)*kWheelDiameterMeters*Math.PI*10;
         
         // Pathing PID constants 
         public static final double kPathingX_kP = 0.1;
