@@ -10,14 +10,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SwerveConstants;
 
-public class Swerve extends SubsystemBase{
+public class Swerve extends SubsystemBase {
+    // Initialize IMU
     private final WPI_Pigeon2 mImu = new WPI_Pigeon2(SwerveConstants.kImuID);
 
     private final SwerveModule mLeftFrontModule, mRightFrontModule, mLeftRearModule, mRightRearModule;
     private SwerveDriveOdometry mOdometry;
 
     public Swerve() {
-        // first set it at zero, look at offset, then change
+        // Instantiate swerve modules - each representing unique module on the robot
         mLeftFrontModule = new SwerveModule(
             SwerveConstants.kLeftFrontThrottleID, 
             SwerveConstants.kLeftFrontRotorID, 
@@ -46,11 +47,13 @@ public class Swerve extends SubsystemBase{
             SwerveConstants.kRightRearRotorOffset
         );
 
+        // Instantiate odometry - used for tracking position
         mOdometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, mImu.getRotation2d());
     }
 
     @Override
     public void periodic() {
+        // Updates odometry with current module state
         mOdometry.update(
             mImu.getRotation2d(), 
             getModuleStates()[0], 
@@ -63,15 +66,16 @@ public class Swerve extends SubsystemBase{
     /**
      * Drives the swerve - Input range: [-1, 1]
      * 
-     * @param xSpeed
-     * @param ySpeed
-     * @param zSpeed
-     * @param fieldOriented
+     * @param xSpeed percent power in the X direction
+     * @param ySpeed percent power in the Y direction
+     * @param zSpeed percent power for rotation
+     * @param fieldOriented configure robot movement style (field or robot oriented)
      */
     public void drive(double xSpeed, double ySpeed, double zSpeed, boolean fieldOriented) {
         SwerveModuleState[] states = null;
         if(fieldOriented) {
             states = SwerveConstants.kSwerveKinematics.toSwerveModuleStates(
+                // IMU used for field oriented control
                 ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, zSpeed, mImu.getRotation2d())
             );
         } else {
@@ -85,7 +89,7 @@ public class Swerve extends SubsystemBase{
     /**
      * Get current swerve module states
      * 
-     * @return swerve module states
+     * @return current states of all modules 
      */
     public SwerveModuleState[] getModuleStates() {
         return new SwerveModuleState[]{

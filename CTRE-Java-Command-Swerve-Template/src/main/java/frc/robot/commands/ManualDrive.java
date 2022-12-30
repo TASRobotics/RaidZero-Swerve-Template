@@ -11,7 +11,8 @@ public class ManualDrive extends CommandBase {
     public ManualDrive(Swerve drive, XboxController controller) {
         mSwerve = drive;
         mController = controller;
-
+        
+        // Adds the Swerve subsystem as a requirement to the command
         addRequirements(mSwerve);
     }
 

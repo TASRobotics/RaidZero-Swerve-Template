@@ -100,7 +100,12 @@ public class SwerveModule {
      * @param state module state 
      */
     public void setState(SwerveModuleState state) {
+        // Optimize the desired state so that the rotor doesn't have to spin more than
+        // 90 degrees to get to the desired angle
         SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getState().angle);
+        
+        // Calculate rotor output using rotor PID controller by comparing the current
+        // angle with the desired angle
         double rotorOutput = mRotorPID.calculate(getState().angle.getDegrees(), optimizedState.angle.getDegrees());
 
         mRotor.set(rotorOutput);
