@@ -9,4 +9,4 @@ Welcome to the Raid Zero swerve template! For more details, check out our [Engli
 - SPARK MAX (NEO) and CANCoder template [here](REV-Java-Command-Swerve-Template)
 - SPARK MAX (NEO) and Analog Encoder template [here](REV-Analog-Java-Command-Swerve-Template)
 
-Download individual templates [here](https://github.com/TASRobotics/RaidZero-Swerve-Template/releases)!
+Download individual templates from the [releases](https://github.com/TASRobotics/RaidZero-Swerve-Template/releases)!
