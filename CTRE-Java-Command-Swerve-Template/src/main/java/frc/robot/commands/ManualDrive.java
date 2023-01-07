@@ -13,11 +13,14 @@ public class ManualDrive extends CommandBase {
         mController = controller;
         
         // Adds the Swerve subsystem as a requirement to the command
+        // 加入 swerve 為這條命令的必要條件
         addRequirements(mSwerve);
     }
 
     @Override
     public void execute() {
+        // Drives with XSpeed, YSpeed, zSpeed
+        // True/false for field-oriented driving
         mSwerve.drive(mController.getLeftY(), mController.getLeftX(), mController.getRightX(), true);
     }
 }   

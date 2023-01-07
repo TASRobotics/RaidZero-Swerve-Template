@@ -39,12 +39,14 @@ public final class Constants {
         public static final int kImuID = 0;
 
         // Rotor encoder offsets
+        // Rotor encoder 偏移量
         public static final double kLeftFrontRotorOffset = 0.0;
         public static final double kRightFrontRotorOffset = 0.0;
         public static final double kLeftRearRotorOffset = 0.0;
         public static final double kRightRearRotorOffset = 0.0;
 
-        // Swerve kinematics; see documentation for more details
+        // Swerve kinematics (order: left front, right front, left rear, right rear)
+        // Swerve kinematics（順序：左前，右前，左後，右後）
         public static final SwerveDriveKinematics kSwerveKinematics = new SwerveDriveKinematics(
             new Translation2d(0.0, 0.0), 
             new Translation2d(0.0, 0.0), 
@@ -58,16 +60,22 @@ public final class Constants {
         public static final double kRotor_kD = 0.0;
 
         // Velocity & acceleration of swerve
+        // Swerve 最大速度 / 加速度
         public static final double kMaxVelocityMetersPerSecond = 3.0;
         public static final double kMaxAccelerationMetersPerSecond = 3.0;
 
         // Wheel diameter
+        // 輪徑
         public static final double kWheelDiameterMeters = 0.0; // wheel diameter
         
         // Throttle gear ratio
         // (number of turns it takes the motor to rotate the rotor one revolution)
+        // Throttle 齒輪比率
+        // （馬達轉動輪子一圈所需的圈數）
         public static final double kThrottleGearRatio = 0.0; 
 
+        // Throttle velocity conversion constant
+        // Throttle 速度轉換 Constant
         // This value will be multiplied to the raw encoder velocity of the throttle motor
         // and should convert it to meters per second
         // This is the general formula: 
