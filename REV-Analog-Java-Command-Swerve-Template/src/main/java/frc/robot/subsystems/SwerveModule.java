@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import frc.robot.Constants;
@@ -74,6 +75,9 @@ public class SwerveModule {
         mThrottleEncoder.setVelocityConversionFactor(
             SwerveConstants.kThrottleVelocityConversionFactor
         );
+        mThrottleEncoder.setPositionConversionFactor(
+            SwerveConstants.kThrottlePositionConversionFactor
+        );
     }
 
     /**
@@ -84,6 +88,18 @@ public class SwerveModule {
     public SwerveModuleState getState() {
         return new SwerveModuleState(
             mThrottleEncoder.getVelocity(), 
+            Rotation2d.fromDegrees(mRotorEncoder.get())
+        );
+    }
+
+    /**
+     * Return current position of module
+     * 
+     * @return module position
+     */
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+            mThrottleEncoder.getPosition(), 
             Rotation2d.fromDegrees(mRotorEncoder.get())
         );
     }

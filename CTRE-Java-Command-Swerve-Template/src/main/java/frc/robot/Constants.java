@@ -82,6 +82,9 @@ public final class Constants {
         //     (1.0 / GEAR RATIO / 2048) * WHEEL DIAMETER * Math.PI * 10;
         public static final double kThrottleVelocityConversionFactor = 
             (1/kThrottleGearRatio/2048)*kWheelDiameterMeters*Math.PI*10;
+
+        public static final double kThrottlePositionConversionFactor = 
+            (1/kThrottleGearRatio/2048)*kWheelDiameterMeters*Math.PI;
         
         // Pathing PID constants 
         public static final double kPathingX_kP = 0.1;

@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SwerveConstants;
@@ -51,20 +52,18 @@ public class Swerve extends SubsystemBase {
 
         // Instantiate odometry - used for tracking position
         // 實例化（instantiate）測程法（odometry） - 用於追踪位置
-        mOdometry = new SwerveDriveOdometry(SwerveConstants.kSwerveKinematics, mImu.getRotation2d());
+        mOdometry = new SwerveDriveOdometry(
+            SwerveConstants.kSwerveKinematics, 
+            mImu.getRotation2d(), 
+            getModulePositions()
+        );
     }
 
     @Override
     public void periodic() {
         // Updates odometry with current module state
         // 使用當前Swerve module狀態更新測程法（odometry）。
-        mOdometry.update(
-            mImu.getRotation2d(), 
-            getModuleStates()[0], 
-            getModuleStates()[1],
-            getModuleStates()[2],
-            getModuleStates()[3]
-        );
+        mOdometry.update(mImu.getRotation2d(), getModulePositions());
     }
 
     /**
@@ -107,6 +106,20 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
+     * Get current swerve module positions
+     * 
+     * @return swerve module positions 
+     */
+    public SwerveModulePosition[] getModulePositions() {
+        return new SwerveModulePosition[] {
+            mLeftFrontModule.getPosition(), 
+            mRightFrontModule.getPosition(), 
+            mLeftRearModule.getPosition(), 
+            mRightRearModule.getPosition()
+        };
+    }
+
+    /**
      * Sets swerve module states
      * 設置 4 個 Swerve module 的狀態。
      * 
@@ -137,6 +150,6 @@ public class Swerve extends SubsystemBase {
      * @param pose robot pose
      */
     public void setPose(Pose2d pose) {
-        mOdometry.resetPosition(pose, mImu.getRotation2d());
+        mOdometry.resetPosition(mImu.getRotation2d(), getModulePositions(), pose);
     }
 }

@@ -9,6 +9,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
@@ -92,6 +93,20 @@ public class SwerveModule {
         
         return new SwerveModuleState(
             throttleVelocity, 
+            Rotation2d.fromDegrees(mRotorEncoder.getAbsolutePosition())
+        );
+    }
+
+    /**
+     * Return current position of module
+     * 
+     * @return module position
+     */
+    public SwerveModulePosition getPosition() {
+        double throttlePosition = mThrottle.getSelectedSensorPosition() * SwerveConstants.kThrottlePositionConversionFactor;
+
+        return new SwerveModulePosition(
+            throttlePosition, 
             Rotation2d.fromDegrees(mRotorEncoder.getAbsolutePosition())
         );
     }
