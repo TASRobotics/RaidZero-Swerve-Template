@@ -63,10 +63,7 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         // Updates odometry with current module state
         // 使用當前Swerve module狀態更新測程法（odometry）。
-        mOdometry.update(
-            mImu.getRotation2d(), 
-            getModulePositions()
-        );
+        mOdometry.update(mImu.getRotation2d(), getModulePositions());
     }
 
     /**
