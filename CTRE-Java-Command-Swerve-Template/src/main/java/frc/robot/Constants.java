@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -32,8 +35,8 @@ public final class Constants {
         public static final int kRightRearCANCoderID = 12;
 
         // Rotor encoder & motor inversion
-        public static final boolean kRotorEncoderDirection = false;
-        public static final boolean kRotorMotorInversion = false;
+        public static final SensorDirectionValue kRotorEncoderDirection = SensorDirectionValue.CounterClockwise_Positive;
+        public static final InvertedValue kRotorMotorInversion = InvertedValue.CounterClockwise_Positive;
 
         // IMU ID
         public static final int kImuID = 0;
@@ -79,12 +82,12 @@ public final class Constants {
         // This value will be multiplied to the raw encoder velocity of the throttle motor
         // and should convert it to meters per second
         // This is the general formula: 
-        //     (1.0 / GEAR RATIO / 2048) * WHEEL DIAMETER * Math.PI * 10;
+        //     (1.0 / GEAR RATIO) * WHEEL DIAMETER * Math.PI;
         public static final double kThrottleVelocityConversionFactor = 
-            (1/kThrottleGearRatio/2048)*kWheelDiameterMeters*Math.PI*10;
+            (1/kThrottleGearRatio)*kWheelDiameterMeters*Math.PI;
 
         public static final double kThrottlePositionConversionFactor = 
-            (1/kThrottleGearRatio/2048)*kWheelDiameterMeters*Math.PI;
+            (1/kThrottleGearRatio)*kWheelDiameterMeters*Math.PI;
         
         // Pathing PID constants 
         public static final double kPathingX_kP = 0.1;
@@ -104,4 +107,6 @@ public final class Constants {
     
     // Controller port
     public static final int kControllerPort = 0;
+
+    public static final double kLongTimeoutMs = 100.;
 }

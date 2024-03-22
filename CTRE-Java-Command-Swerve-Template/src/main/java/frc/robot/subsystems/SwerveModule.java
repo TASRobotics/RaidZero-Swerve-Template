@@ -1,28 +1,31 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 
 public class SwerveModule {
     // Initialize rotor & throttle motors 
     // 初始化 rotor & throttle 馬達
-    private WPI_TalonFX mRotor;
-    private WPI_TalonFX mThrottle;
+    private TalonFX mRotor;
+    private TalonFX mThrottle;
 
     // Initialize rotor encoder
     // 初始化 rotor encoder
-    private WPI_CANCoder mRotorEncoder; 
+    private CANcoder mRotorEncoder; 
 
     // Initialize rotor PID controller
     // 初始化 rotor PID controller
@@ -39,32 +42,26 @@ public class SwerveModule {
     public SwerveModule(int throttleID, int rotorID, int rotorEncoderID, double rotorOffsetAngleDeg)
     {
         // 實例化 throttle 馬達
-        mThrottle = new WPI_TalonFX(throttleID);
+        mThrottle = new TalonFX(throttleID);
 
         // 實例化 rotor 馬達
-        mRotor = new WPI_TalonFX(rotorID);
+        mRotor = new TalonFX(rotorID);
 
         // 實例化 rotor absolute encoder
-        mRotorEncoder = new WPI_CANCoder(rotorEncoderID);
-
-        // 重置所有配置（保險起見以免有舊的配置）
-        mThrottle.configFactoryDefault();
-        mRotor.configFactoryDefault();
-        mRotorEncoder.configFactoryDefault();
+        mRotorEncoder = new CANcoder(rotorEncoderID);
 
         // 根據之前的常數配置 rotor 馬達
-        mRotor.setInverted(SwerveConstants.kRotorMotorInversion);
-        mRotor.configVoltageCompSaturation(Constants.kVoltageCompensation);
-        mRotor.enableVoltageCompensation(true);
-        mRotor.setNeutralMode(NeutralMode.Brake);
+        MotorOutputConfigs rotorMotorOutputConfigs = new MotorOutputConfigs();
+        rotorMotorOutputConfigs.Inverted = SwerveConstants.kRotorMotorInversion;
+        rotorMotorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
+        mRotor.getConfigurator().apply(new TalonFXConfiguration().withMotorOutput(rotorMotorOutputConfigs), Constants.kLongTimeoutMs);
 
         // 根據之前的常數配置轉向 rotor encoder
-        mRotorEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-        mRotorEncoder.configMagnetOffset(rotorOffsetAngleDeg);
-        mRotorEncoder.configSensorDirection(SwerveConstants.kRotorEncoderDirection);
-        mRotorEncoder.configSensorInitializationStrategy(
-            SensorInitializationStrategy.BootToAbsolutePosition
-        );
+        MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
+        magnetSensorConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        magnetSensorConfigs.SensorDirection = SwerveConstants.kRotorEncoderDirection;
+        magnetSensorConfigs.MagnetOffset = rotorOffsetAngleDeg;
+        mRotorEncoder.getConfigurator().apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfigs), Constants.kLongTimeoutMs);
 
         // 根據之前的常數配置 rotor 馬達的PID控制器
         mRotorPID = new PIDController(
@@ -77,10 +74,9 @@ public class SwerveModule {
         mRotorPID.enableContinuousInput(-180, 180);
 
         // 根據之前的常數配置 throttle 馬達
-        mThrottle.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-        mThrottle.configVoltageCompSaturation(Constants.kVoltageCompensation);
-        mThrottle.enableVoltageCompensation(true);
-        mThrottle.setNeutralMode(NeutralMode.Brake);
+        MotorOutputConfigs throttleMotorOutputConfigs = new MotorOutputConfigs();
+        throttleMotorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
+        mThrottle.getConfigurator().apply(new TalonFXConfiguration().withMotorOutput(throttleMotorOutputConfigs), Constants.kLongTimeoutMs);
     }
 
     /**
@@ -89,11 +85,11 @@ public class SwerveModule {
      * @return module state
      */
     public SwerveModuleState getState() {
-        double throttleVelocity = mThrottle.getSelectedSensorVelocity() * SwerveConstants.kThrottleVelocityConversionFactor; 
+        double throttleVelocity = mThrottle.getVelocity().getValueAsDouble() * SwerveConstants.kThrottleVelocityConversionFactor; 
         
         return new SwerveModuleState(
             throttleVelocity, 
-            Rotation2d.fromDegrees(mRotorEncoder.getAbsolutePosition())
+            Rotation2d.fromRotations(mRotorEncoder.getAbsolutePosition().getValueAsDouble())
         );
     }
 
@@ -103,11 +99,11 @@ public class SwerveModule {
      * @return module position
      */
     public SwerveModulePosition getPosition() {
-        double throttlePosition = mThrottle.getSelectedSensorPosition() * SwerveConstants.kThrottlePositionConversionFactor;
+        double throttlePosition = mThrottle.getPosition().getValueAsDouble() * SwerveConstants.kThrottlePositionConversionFactor;
 
         return new SwerveModulePosition(
             throttlePosition, 
-            Rotation2d.fromDegrees(mRotorEncoder.getAbsolutePosition())
+            Rotation2d.fromRotations(mRotorEncoder.getAbsolutePosition().getValueAsDouble())
         );
     }
 

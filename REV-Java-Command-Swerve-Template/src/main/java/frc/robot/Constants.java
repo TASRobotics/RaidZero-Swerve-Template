@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -32,7 +34,7 @@ public final class Constants {
         public static final int kRightRearCANCoderID = 12;
 
         // Rotor encoder & motor inversion
-        public static final boolean kRotorEncoderDirection = false;
+        public static final SensorDirectionValue kRotorEncoderDirection = SensorDirectionValue.CounterClockwise_Positive;
         public static final boolean kRotorMotorInversion = false;
 
         // IMU ID
@@ -104,4 +106,6 @@ public final class Constants {
     
     // Controller port
     public static final int kControllerPort = 0;
+
+    public static final double kLongTimeoutMs = 100.;
 }

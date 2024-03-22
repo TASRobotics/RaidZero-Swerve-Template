@@ -1,17 +1,19 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 
@@ -24,7 +26,7 @@ public class SwerveModule {
     private RelativeEncoder mThrottleEncoder;
 
     // 初始化 rotor encoder
-    private WPI_CANCoder mRotorEncoder;
+    private CANcoder mRotorEncoder;
 
     // 初始化 rotor PID controller
     private PIDController mRotorPID;
@@ -47,12 +49,11 @@ public class SwerveModule {
         mRotor = new CANSparkMax(rotorID, MotorType.kBrushless);
 
         // 實例化 rotor absolute encoder
-        mRotorEncoder = new WPI_CANCoder(rotorEncoderID);
+        mRotorEncoder = new CANcoder(rotorEncoderID);
 
         // 重置所有配置（保險起見以免有舊的配置）
         mThrottle.restoreFactoryDefaults();
         mRotor.restoreFactoryDefaults();
-        mRotorEncoder.configFactoryDefault();
 
         // 根據之前的常數配置 rotor 馬達
         mRotor.setInverted(SwerveConstants.kRotorMotorInversion);
@@ -60,12 +61,11 @@ public class SwerveModule {
         mRotor.setIdleMode(IdleMode.kBrake);
 
         // 根據之前的常數配置轉向 rotor encoder
-        mRotorEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-        mRotorEncoder.configMagnetOffset(rotorOffsetAngleDeg);
-        mRotorEncoder.configSensorDirection(SwerveConstants.kRotorEncoderDirection);
-        mRotorEncoder.configSensorInitializationStrategy(
-            SensorInitializationStrategy.BootToAbsolutePosition
-        );
+        MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
+        magnetSensorConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        magnetSensorConfigs.SensorDirection = SwerveConstants.kRotorEncoderDirection;
+        magnetSensorConfigs.MagnetOffset = rotorOffsetAngleDeg;
+        mRotorEncoder.getConfigurator().apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfigs), Constants.kLongTimeoutMs);
 
         // 根據之前的常數配置 rotor 馬達的PID控制器
         mRotorPID = new PIDController(
@@ -98,7 +98,7 @@ public class SwerveModule {
     public SwerveModuleState getState() {
         return new SwerveModuleState(
             mThrottleEncoder.getVelocity(),
-            Rotation2d.fromDegrees(mRotorEncoder.getAbsolutePosition())
+            Rotation2d.fromRotations(mRotorEncoder.getAbsolutePosition().getValueAsDouble())
         );
     }
     
@@ -110,7 +110,7 @@ public class SwerveModule {
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
             mThrottleEncoder.getPosition(), 
-            Rotation2d.fromDegrees(mRotorEncoder.getAbsolutePosition())
+            Rotation2d.fromRotations(mRotorEncoder.getAbsolutePosition().getValueAsDouble())
         );
     }
 

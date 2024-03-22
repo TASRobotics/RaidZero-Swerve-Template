@@ -4,14 +4,12 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.SwerveConstants;
+
 import frc.robot.commands.ManualDrive;
 import frc.robot.subsystems.Swerve;
 
@@ -25,37 +23,9 @@ public class RobotContainer {
     // 創造一個新的 ManualDrive instance, 給他 Swerve 跟 Controller 當 parameters
     private final ManualDrive mManualDriveCommand = new ManualDrive(mSwerve, mController);
 
-    // PID controller for movement in the X direction
-    // X 方向的 PID 控制器
-    private PIDController mXController = new PIDController(
-        SwerveConstants.kPathingX_kP, 
-        SwerveConstants.kPathingX_kI, 
-        SwerveConstants.kPathingX_kD
-    );
-
-    // PID controller for movement in the Y direction
-    // Y 方向的 PID 控制器
-    private PIDController mYController = new PIDController(
-        SwerveConstants.kPathingY_kP, 
-        SwerveConstants.kPathingY_kI, 
-        SwerveConstants.kPathingY_kD
-    );
-
-    // PID controller for robot heading
-    // 面對方向的 PID 控制器
-    private PIDController mThetaController = new PIDController(
-        SwerveConstants.kPathingTheta_kP, 
-        SwerveConstants.kPathingTheta_kI, 
-        SwerveConstants.kPathingTheta_kD
-    );
-
     // Extract trajectory from PathPlanner
     // 從 PathPlanner 獲取 trajectory
-    private PathPlannerTrajectory mTrajectory = PathPlanner.loadPath(
-        "New Path", 
-        SwerveConstants.kMaxVelocityMetersPerSecond, 
-        SwerveConstants.kMaxAccelerationMetersPerSecond
-    );
+    private PathPlannerPath mTrajectory = PathPlannerPath.fromPathFile("New Path");
 
     public RobotContainer() {
         // Configure the button bindings
@@ -67,21 +37,6 @@ public class RobotContainer {
     private void configureButtonBindings() {}
 
     public Command getAutonomousCommand() {
-        // Generate path following command from mTrajectory
-        // 從 mTrajectory 生成 path following command
-        PPSwerveControllerCommand command = new PPSwerveControllerCommand(
-            mTrajectory, 
-            mSwerve::getPose, 
-            SwerveConstants.kSwerveKinematics, 
-            mXController, 
-            mYController, 
-            mThetaController, 
-            mSwerve::setModuleStates, 
-            mSwerve
-        );
-
-        // `andThen...` is used to stop the robot after the path is finished
-        // `andThen...` 用於在路徑完成後停止機器人
-        return command.andThen(() -> mSwerve.drive(0, 0, 0, false));
+        return AutoBuilder.followPath(mTrajectory);
     }
 }
